@@ -37,7 +37,7 @@ def to_CIDR_notation(bytes_network, bytes_netmask):
     return net
 
 
-def get_neighbors(net, interface, timeout=5):
+def get_neighbors(net, interface, timeout=15):
     logger.info("arping %s on %s" % (net, interface))
     result = list()
     try:
