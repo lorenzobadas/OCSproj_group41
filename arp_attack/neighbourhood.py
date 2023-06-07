@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def long2net(arg):
-    if (arg <= 0 or arg >= 0xFFFFFFFF):
+    if arg <= 0 or arg >= 0xFFFFFFFF:
         raise ValueError("illegal netmask value", hex(arg))
     return 32 - int(round(math.log(0xFFFFFFFF - arg, 2)))
 
@@ -37,27 +37,27 @@ def to_CIDR_notation(bytes_network, bytes_netmask):
     return net
 
 
-def get_neighbors(net, interface, timeout=15):
+def get_neighbors(net, interface, timeout=15, verbose=False):
     logger.info("arping %s on %s" % (net, interface))
-    result = list()
+    result = []
     try:
-        ans, unans = scapy.layers.l2.arping(net, iface=interface, timeout=timeout, verbose=True)
+        ans, unans = scapy.layers.l2.arping(net, iface=interface, timeout=timeout, verbose=verbose)
         for s, r in ans.res:
             result.append([r.sprintf("%Ether.src%"), r.sprintf("%ARP.psrc%"), interface])
     except socket.error as e:
-        if e.errno == errno.EPERM:     # Operation not permitted
+        if e.errno == errno.EPERM:  # Operation not permitted
             logger.error("%s. Did you run as root?", e.strerror)
         else:
             raise
     return result
 
 
-def main(interface_to_scan=None):
+def main(interface_to_scan=None, verbose=False):
     if os.geteuid() != 0:
         print('You need to be root to run this script', file=sys.stderr)
         sys.exit(1)
 
-    scan_result = list()
+    scan_result = []
     for network, netmask, _, interface, address, _ in scapy.config.conf.route.routes:
 
         if interface_to_scan and interface_to_scan != interface:
@@ -71,17 +71,14 @@ def main(interface_to_scan=None):
             continue
 
         # skip docker interface
-        if interface != interface_to_scan \
-                and (interface.startswith('docker')
-                     or interface.startswith('br-')
-                     or interface.startswith('tun')):
+        if interface != interface_to_scan and (interface.startswith('docker') or interface.startswith('br-') or interface.startswith('tun')):
             logger.warning("Skipping interface '%s'" % interface)
             continue
 
         net = to_CIDR_notation(network, netmask)
 
         if net:
-            scan_result += get_neighbors(net, interface)
+            scan_result += get_neighbors(net, interface, verbose=verbose)
     return scan_result
 
 
@@ -98,6 +95,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     interface = None
+    verbose = False
 
     for o, a in opts:
         if o in ('-h', '--help'):
@@ -105,11 +103,13 @@ if __name__ == "__main__":
             sys.exit()
         elif o in ('-i', '--interface'):
             interface = a
+        elif o == '--verbose':
+            verbose = True
         else:
             assert False, 'unhandled option'
 
-    main(interface_to_scan=interface)
+    main(interface_to_scan=interface, verbose=verbose)
 
-def start_scan(verbose, interface = None):
 
-    return main(interface_to_scan=interface)
+def start_scan(verbose=False, interface=None):
+    return main(interface_to_scan=interface, verbose=verbose)
