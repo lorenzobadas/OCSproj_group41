@@ -14,14 +14,14 @@ To use the DNS Redirect Tool, follow the steps below:
 
 1. Install the required libraries mentioned in the prerequisites section.
 
-2. Save the code in a Python file (e.g., `dns_redirect_tool.py`).
+2. Save the code in a Python file (e.g., `dns_attack.py`).
 
 3. Open a terminal or command prompt and navigate to the directory containing the script.
 
 4. Run the script using the following command:
 
    ```
-   python dns_redirect_tool.py <interface> [-v] [-vd <victim_domain>] [-r <redirected_ip>]
+   python3 dns_attack.py <interface> [-v] [-vd <victim_domain>] [-r <redirected_ip>]
    ```
 
    - `<interface>` (mandatory): The network interface to capture and modify DNS packets on.
@@ -43,7 +43,7 @@ To use the DNS Redirect Tool, follow the steps below:
 1. Redirect all DNS responses to a specific IP address:
 
    ```
-   python dns_redirect_tool.py eth0 -r 192.168.1.100
+   python3 dns_attack.py eth0 -r 192.168.1.100
    ```
 
    This command will intercept DNS responses on the `eth0` interface and redirect them to the IP address `192.168.1.100`.
@@ -51,7 +51,7 @@ To use the DNS Redirect Tool, follow the steps below:
 2. Redirect DNS responses for a specific domain to a different IP address:
 
    ```
-   python dns_redirect_tool.py wlan0 -r 10.0.0.99 -vd example.com
+   python3 dns_attack.py wlan0 -r 10.0.0.99 -vd example.com
    ```
 
    This command will intercept DNS responses on the `wlan0` interface and redirect only the responses containing the domain `example.com` to the IP address `10.0.0.99`.
@@ -59,7 +59,7 @@ To use the DNS Redirect Tool, follow the steps below:
 3. Redirect DNS responses with verbose output:
 
    ```
-   python dns_redirect_tool.py eth1 -r 172.16.0.50 -v
+   python3 dns_attack.py eth1 -r 172.16.0.50 -v
    ```
 
    This command will intercept DNS responses on the `eth1` interface and redirect them to the IP address `172.16.0.50`, displaying verbose output during the execution.
