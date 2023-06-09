@@ -1,5 +1,5 @@
-from neighbourhood import start_scan
-from utilities import get_my_mac_address, get_mac_address
+from .neighbourhood import start_scan
+from .utilities import get_my_mac_address, get_mac_address
 import argparse
 import threading
 from scapy.all import Ether, ARP, sendp, sniff
