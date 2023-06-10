@@ -2,8 +2,8 @@ import argparse
 from arp_attack.arp_attack import *
 from arp_attack.utilities import get_my_ip_address
 from dns_attack.dns_attack import *
-from flask_redirect.reverse_proxy import proxy_attack
-from flask_redirect.flask_proxy import flask_proxy_thread
+from ssl_stripping.reverse_proxy import proxy_attack
+from ssl_stripping.flask_proxy import flask_proxy_thread
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
