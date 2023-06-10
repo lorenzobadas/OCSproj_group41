@@ -2,7 +2,7 @@ import http.server
 import ssl
 
 # Set up server address and port
-server_address = ('', 8002)  # Listen on port 8000
+server_address = ('', 443)  # Listen on port 8000
 server_cert = './certificates/server.crt'  # Path to your server's SSL certificate
 server_key = './certificates/server.key'  # Path to your server's SSL private key
 
@@ -37,7 +37,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(file.read())
 
     def do_GET(self):
-        if self.path == '/login.html':
+        if self.path == '/':
+            # Redirect to the login page
+            self.send_response(302)
+            self.send_header('Location', '/login.html')
+            self.end_headers()
+        elif self.path == '/login.html':
             # Serve the login page
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
