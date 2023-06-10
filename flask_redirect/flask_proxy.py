@@ -1,5 +1,6 @@
 from flask import Flask, request, Response
 import requests
+import threading
 
 app = Flask(__name__)
 
@@ -27,3 +28,10 @@ def proxy_request(path):
 
 if __name__ == '__main__':
     app.run(port=8000)
+
+def flask_proxy(port):
+    app.run(port=port)
+
+def flask_proxy_thread():
+    thread = threading.Thread(target=flask_proxy, args=(8000,))
+    thread.start()
