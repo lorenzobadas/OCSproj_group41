@@ -65,16 +65,6 @@ To use the DNS Redirect Tool, follow the steps below:
 
    This command will intercept DNS responses on the `eth1` interface and redirect them to the IP address `172.16.0.50`, displaying verbose output during the execution.
 
-## Important Notes
+## Notes
 
 - Ensure that the script is executed with root or administrator privileges, as it requires access to network interfaces and iptables rules.
-
-- The script modifies DNS responses by manipulating packets at the network layer. Use this tool responsibly and in compliance with applicable laws and regulations.
-
-- Before running the script, make sure you understand the potential impact of DNS redirection and use it only in controlled environments for authorized testing or educational purposes.
-
-- It is recommended to familiarize yourself with the Scapy library and the netfilterqueue library for a better understanding of the underlying packet manipulation and interception techniques.
-
-## Disclaimer
-
-The DNS Redirect Tool is provided as-is without any warranties or guarantees. Use it at your own risk. The authors of this tool shall not be held responsible for
