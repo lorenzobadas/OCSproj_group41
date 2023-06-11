@@ -55,16 +55,6 @@ To use the ARP Poisoning Tool, follow the steps below:
 
    This command will perform a network scan on the `wlan0` interface, display the list of scanned devices, and prompt you to choose two victims for the MITM attack.
 
-## Important Notes
+## Notes
 
 - Ensure that the script is executed with root or administrator privileges, as ARP poisoning requires low-level network access.
-
-- The script utilizes ARP poisoning, which is a malicious technique. Use this tool responsibly and only in controlled environments with proper authorization.
-
-- Be aware of the legal implications and potential consequences of performing ARP poisoning attacks without proper authorization. Make sure to comply with applicable laws and regulations.
-
-- It is recommended to familiarize yourself with ARP (Address Resolution Protocol) and the Scapy library to gain a better understanding of the underlying mechanisms and techniques employed by the script.
-
-## Disclaimer
-
-The ARP Poisoning Tool is provided as-is without any warranties or guarantees. Use it at your own risk. The authors of this tool shall not be held responsible for any damages or misuse of the tool.
