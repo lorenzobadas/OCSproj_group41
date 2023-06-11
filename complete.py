@@ -13,9 +13,13 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')
     parser.add_argument('-vd', '--victim-domain', metavar='DOMAIN', help='Optional argument: victim domain')
     parser.add_argument('-r', '--redirected_ip', metavar='IP', help='Optional argument: redirected ip')
+    parser.add_argument('-a', '--arp', action='store_true', help='Performs ARP poisoning')
+    parser.add_argument('-d', '--dns', action='store_true', help='Performs DNS spoofing')
     args = parser.parse_args()
 
     interface = args.interface
+    arp = args.arp
+    dns = args.dns
     silent = args.silent
     targets = args.targets
     redirected_ip = args.redirected_ip
@@ -33,8 +37,14 @@ if __name__ == '__main__':
         victim2 = Address(mac2, targets[1], interface)
 
         mitm_attack(victim1, victim2, interface, silent)
+    if arp:
+        exit()
 
     dns_attack_thread(interface, redirected_ip, victim_domain, verbose)
+
+    if dns:
+        exit()
+
     flask_proxy_thread()
 
     proxy_attack(get_my_ip_address(interface))
