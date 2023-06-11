@@ -1,6 +1,7 @@
-# DNS Redirect Tool
+# DNS Spoofing Tool
 
-The DNS Redirect Tool is a Python script that allows you to redirect DNS responses to a specified IP address. It utilizes the Scapy library to intercept and modify DNS packets.
+The DNS Spoofing Tool is a Python script that allows you to redirect DNS responses to a specified IP address. It utilizes the Scapy library to intercept and modify DNS packets.
+This script assumes the user is already in a man-in-the-middle position.
 
 ## Prerequisites
 
